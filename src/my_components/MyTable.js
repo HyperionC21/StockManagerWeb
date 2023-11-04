@@ -43,14 +43,21 @@ const columns = [
 
 export default function MyTable(props) {
 
-    const ticker = props.ticker
+    const ticker = props.ticker;
+    const selectedOption = props.selectedOption;
 
     const [rows, setRows] = React.useState([
 
       ]);
-    
+  
+
     React.useEffect(() => {
-        fetch(`${SERVER_URL}activity?ticker=${props.ticker}`)
+        const searchParams = new URLSearchParams({
+          ticker : props.ticker,
+          filter_kind : props.selectedOption
+        })
+
+        fetch(`${SERVER_URL}activity?` + searchParams)
           .then((response) => response.json())
           .then((data) => {
             const rows_ = Object.keys(data['date']).map((key) => ({

@@ -16,6 +16,7 @@ function SecurityMetrics(props) {
   const [total_security_equity_gain_amt, setTotalSecurityEquityGainAmt] = useState(0);
   const [total_security_equity_amt, setTotalSecurityEquityAmt] = useState(0);
   const [annualized_profit_perc, setAnnualizedProfitPerc] = useState(5);
+  const [div_yield, setDivYield] = useState(0);
 
   useEffect(() => {
     async function fetch_PE() {
@@ -55,6 +56,25 @@ function SecurityMetrics(props) {
     }
 
     fetch_total_div_amt();
+
+  }, [focusedTicker])
+
+  useEffect(() => {
+    async function fetch_div_yield() {
+      var response = await fetch(`${SERVER_URL}metric?`+ new URLSearchParams({
+        ticker: focusedTicker,
+        filter_kind: selectedOption,
+        period: '1Y',
+        metric: 'div_yield'
+      }));
+      var actualData = await response.json();
+      var div_yield = actualData['val']
+    
+  
+      setDivYield(div_yield);
+    }
+
+    fetch_div_yield();
 
   }, [focusedTicker])
 
@@ -146,6 +166,10 @@ function SecurityMetrics(props) {
   {
     'metric_name' : 'YoY Percent Return',
     'metric_val' : `${annualized_profit_perc}%`
+  },
+  {
+    'metric_name' : 'Dividend Yield',
+    'metric_val' : `${div_yield}%`
   }
   ];
 

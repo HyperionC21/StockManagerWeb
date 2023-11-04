@@ -12,7 +12,7 @@ import MyTable from './my_components/MyTable';
 
 const SERVER_ADDRESS = '192.168.100.5'
 const SERVER_PORT = '5001'
-const STEP = 30
+const STEP = 90
 const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
 
 function App() {
@@ -123,7 +123,7 @@ function App() {
       <SecurityMetrics focusedTicker={focusedTicker} selectedOption={selectedOption} />
     </div>
     <div style={{flex: "12", width: "500", justifyContent: "center"}}>
-      <MyTable ticker={focusedTicker}/>
+      <MyTable ticker={focusedTicker} selectedOption={selectedOption} />
     </div>
   </div>
 </div>

@@ -8,14 +8,14 @@ const DividendForm = () => {
   const [ticker, setTicker] = useState('');
   const [date, setDate] = useState('');
   const [amount, setAmount] = useState('');
-  const [fx, setFx] = useState('');
+  const [fxForm, setFxForm] = useState('');
 
   const dataPost = () => {
     const data = {
         ticker: ticker,
         date: date,
         amount: amount,
-        fx: fx,
+        fx: fxForm,
     }
 
     fetch(`${SERVER_URL}new_dividend`, {
@@ -27,7 +27,7 @@ const DividendForm = () => {
     setTicker('');
     setAmount(0);
     setDate('');
-    setFx(1);
+    setFxForm(1);
 }
 
 
@@ -67,8 +67,8 @@ const DividendForm = () => {
       <p style={{ textAlign: "left", width:"25%", margin: 10 }}>{'FX:'}</p>
       <input
         type="text"
-        value={setFx}
-        onChange={(e) => setFx(e.target.value)}
+        value={fxForm}
+        onChange={(e) => setFxForm(e.target.value)}
         placeholder="1"
         style={{ textAlign: "right", justifyContent: "flex-end", margin: 10 }}
       />
