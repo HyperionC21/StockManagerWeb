@@ -1,7 +1,8 @@
 import React from 'react';
 import { useEffect, useState, useRef } from "react";
 
-const SERVER_ADDRESS = '192.168.100.5'
+import { SERVER_ADDRESS } from './constants.tsx';
+
 const SERVER_PORT = '5001'
 const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
 

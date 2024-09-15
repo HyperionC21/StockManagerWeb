@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import { SERVER_ADDRESS } from './constants.tsx';
 
-const SERVER_ADDRESS = '192.168.100.5'
 const SERVER_PORT = '5001'
 const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
 

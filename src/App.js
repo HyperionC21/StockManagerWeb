@@ -8,12 +8,14 @@ import MyBottomDrawer from './my_components/MyBottomDrawer';
 import SecurityMetrics from './my_components/SecurityMetrics';
 import MyLineChart from './my_components/MyLineChart';
 import MyTable from './my_components/MyTable';
+import MyDiscreteSlider from './my_components/MyDiscreteSlider';
 
+import { SERVER_ADDRESS } from './my_components/constants.tsx';
 
-const SERVER_ADDRESS = '192.168.100.5'
 const SERVER_PORT = '5001'
 const STEP = 90
 const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
+const INITIAL_STEP = 30
 
 function App() {
 
@@ -32,6 +34,7 @@ function App() {
 
   const [focusedTicker, setFocusedTicker] = useState('ALL');
 
+  const [step, setStep] = React.useState(INITIAL_STEP);
 
 
 
@@ -40,13 +43,13 @@ function App() {
     var searchParams = new URLSearchParams({
       filter_kind: selectedOption,
       filters: focusedTicker,
-      step: STEP,
+      step: step,
       kind: isAbsolute ? 'Absolute' : 'Percentage'
     });
 
     if (focusedTicker === 'ALL') {
       searchParams = new URLSearchParams({
-        step: STEP,
+        step: step,
         kind: isAbsolute ? 'Absolute' : 'Percentage'
       });
     }
@@ -57,7 +60,10 @@ function App() {
 
         const dateSeries = Object.values(res_val.date);
         const profitSeries = Object.values(res_val.profit);
-        
+        const colorSeries = profitSeries.map((value) => {
+          // If the value is positive, set the color to green; if negative, set it to red; otherwise, set it to black (or any other color of your choice)
+          return value > 0 ? 'green' : value < 0 ? 'red' : 'black';
+        });
         
         setLineData({
           'date' : dateSeries,
@@ -68,7 +74,7 @@ function App() {
         // Handle any errors here
         console.log(error);
       });
-  }, [focusedTicker, isAbsolute]);
+  }, [focusedTicker, isAbsolute, step]);
 
     // Fetch the data from the API when the component mounts
   useEffect(() => {
@@ -110,9 +116,13 @@ function App() {
             <div style={{marginTop: "2%"}}> 
               <MyToggleButton cb={setIsAbsolute} />
             </div>
-            
         </div>
-        
+        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginRight: '2%'}}>
+            <p style={{flex: "1", width: "50%"}}> Performance Chart Step Slider </p>
+            <div style={{marginTop: "2%", width: "50%"}}> 
+              <MyDiscreteSlider onChangeStep={setStep} initialValue={INITIAL_STEP} />
+            </div>
+        </div>
       </div>
   </div>
   <div style= {{ display: "flex", width: "100%", flex: "5", justifyContent: "center", marginTop: "50px", paddingBottom: "100px" }}>
