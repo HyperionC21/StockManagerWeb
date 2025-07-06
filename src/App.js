@@ -11,11 +11,12 @@ import MyTable from './my_components/MyTable';
 import MyDiscreteSlider from './my_components/MyDiscreteSlider';
 
 import { SERVER_ADDRESS } from './my_components/constants.tsx';
+import MyPortfolioTable from './my_components/MyPortfolioTable.js';
 
 const SERVER_PORT = '5001'
 const STEP = 90
 const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
-const INITIAL_STEP = 30
+const INITIAL_STEP = 90
 
 function App() {
 
@@ -135,6 +136,9 @@ function App() {
     <div style={{flex: "12", width: "500", justifyContent: "center"}}>
       <MyTable ticker={focusedTicker} selectedOption={selectedOption} />
     </div>
+  </div>
+  <div style={{display: "flex", paddingTop: "30px", flexDirection: "row", flex: "2", borderWidth: "5px", justifyContent: "center"}}>
+    <MyPortfolioTable/>
   </div>
 </div>
 

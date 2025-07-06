@@ -3,7 +3,7 @@ import Slider from '@mui/material/Slider';
 import Typography from '@mui/material/Typography';
 
 const MyDiscreteSlider = ({ onChangeStep, initialValue }) => {
-  const [step, setStep] = React.useState(initialValue || 30);
+  const [step, setStep] = React.useState(initialValue || 90);
 
   const marks = [
     { value: 7, label: '7' },
