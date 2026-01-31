@@ -25,6 +25,7 @@ function App() {
     'date' : ['2023-may-15'],
     'profit' : [1241]
   });
+  const [isLineLoading, setIsLineLoading] = useState(false);
   const options = [
     { value: 'TICKER', label: 'TICKER' },
     { value: 'COUNTRY', label: 'COUNTRY' },
@@ -39,6 +40,8 @@ function App() {
 
 
   useEffect(() => {
+
+    setIsLineLoading(true);
 
     var searchParams = new URLSearchParams({
       filter_kind: selectedOption,
@@ -69,6 +72,9 @@ function App() {
           'date' : dateSeries,
           'profit' : profitSeries 
         });
+      })
+      .finally(() => {
+        setIsLineLoading(false);
       })
       .catch((error) => {
         // Handle any errors here
@@ -144,7 +150,12 @@ function App() {
         <section className="card">
           <h2 className="card__title">Performance</h2>
           <div className="chart-area">
-            <MyLineChart profit={lineData.profit} date={lineData.date} option={focusedTicker} />
+            <MyLineChart
+              profit={lineData.profit}
+              date={lineData.date}
+              option={focusedTicker}
+              loading={isLineLoading}
+            />
           </div>
         </section>
 
