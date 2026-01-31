@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, CircularProgress, Typography } from '@material-ui/core';
 import Chart from 'react-apexcharts';
 
 function MyLineChart(props) {
@@ -78,9 +79,27 @@ function MyLineChart(props) {
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <Box className="performance-chart" position="relative">
       <Chart options={options} series={series} type="line" height={350} width="100%" />
-    </div>
+      {props.loading && (
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          gridGap={10}
+          bgcolor="rgba(255, 255, 255, 0.7)"
+          borderRadius={12}
+        >
+          <CircularProgress size={20} thickness={5} />
+          <Typography variant="body2" color="textSecondary">Updating chart...</Typography>
+        </Box>
+      )}
+    </Box>
   );
 }
 
