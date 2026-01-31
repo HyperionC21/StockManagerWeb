@@ -1,9 +1,9 @@
 import React from 'react';
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import { SERVER_ADDRESS } from './constants.tsx';
 
-const SERVER_PORT = '5001'
+const SERVER_PORT = '5000'
 const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
 
 function SecurityMetrics(props) {
@@ -176,29 +176,23 @@ function SecurityMetrics(props) {
 
 
   // define a function to render each metric
-  function renderMetric(metric) {
-    // return some JSX for each metric
-    return (
-      <div style={{ display: 'flex', flexDirection: 'row', width: "100%" }}>
-        <p style={{ textAlign: "left", width:"75%", margin: 10, }}>{metric.metric_name}</p>
-        <p style={{ textAlign: "right", justifyContent: "flex-end", margin: 10 }}>{metric.metric_val}</p>
-      </div>
-    );
-  }
-
   // return the JSX for the component
   return (
-    <div style={{width: "50%"}}>
-      <div
-        style={{
-          marginTop: 20,
-          flexDirection: 'column',
-        }}
-      >
-        <div style={{ color: 'black', fontWeight: 'bold', width: "100%", fontSize: 20, marginBottom: 20, paddingTop: 20 }}>
-          {focusedTicker}
+    <div className="metrics">
+      <div className="metrics__header">
+        <div>
+          <p className="metrics__eyebrow">Focused Ticker</p>
+          <h3 className="metrics__title">{focusedTicker}</h3>
         </div>
-        {metricsList.map((metric) => renderMetric(metric))}
+        <div className="metrics__badge">Snapshot</div>
+      </div>
+      <div className="metrics__grid">
+        {metricsList.map((metric) => (
+          <div key={metric.metric_name} className="metrics__item">
+            <span className="metrics__label">{metric.metric_name}</span>
+            <span className="metrics__value">{metric.metric_val}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

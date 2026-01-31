@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { Box, Button, Grid, TextField } from '@material-ui/core';
 
 import { SERVER_ADDRESS } from './constants.tsx';
 
-const SERVER_PORT = '5001'
+const SERVER_PORT = '5000'
 const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
 
 const DividendForm = () => {
@@ -33,51 +34,57 @@ const DividendForm = () => {
 
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: "center" }}>
-    <div style={{ display: 'flex', flexDirection: 'row', width: "100%", justifyContent: "center" }}>
-      <p style={{ textAlign: "left", width:"25%", margin: 10 }}>{'TICKER:'}</p>
-      <input
-        type="text"
-        value={ticker}
-        onChange={(e) => setTicker(e.target.value)}
-        placeholder="AAPL"
-        style={{ textAlign: "right", justifyContent: "flex-end", margin: 10 }}
-      />
-    </div>
-    <div style={{ display: 'flex', flexDirection: 'row', width: "100%", justifyContent: "center" }}>
-      <p style={{ textAlign: "left", width:"25%", margin: 10 }}>{'DATE:'}</p>
-      <input
-        type="text"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        placeholder="2022-01-01"
-        style={{ textAlign: "right", justifyContent: "flex-end", margin: 10 }}
-      />
-    </div>
-    <div style={{ display: 'flex', flexDirection: 'row', width: "100%", justifyContent: "center" }}>
-      <p style={{ textAlign: "left", width:"25%", margin: 10 }}>{'AMOUNT:'}</p>
-      <input
-        type="text"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        placeholder="5"
-        style={{ textAlign: "right", justifyContent: "flex-end", margin: 10 }}
-      />
-    </div>
-    <div style={{ display: 'flex', flexDirection: 'row', width: "100%", justifyContent: "center" }}>
-      <p style={{ textAlign: "left", width:"25%", margin: 10 }}>{'FX:'}</p>
-      <input
-        type="text"
-        value={fxForm}
-        onChange={(e) => setFxForm(e.target.value)}
-        placeholder="1"
-        style={{ textAlign: "right", justifyContent: "flex-end", margin: 10 }}
-      />
-    </div>
-    <div style={{ display:'flex', justifyContent:'center' }}>
-        <button onClick={dataPost}>Submit</button>
-    </div>
-  </div>
+    <Box display="flex" flexDirection="column" gridGap={16}>
+      <Box fontSize={18} fontWeight={600}>New Dividend</Box>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <TextField
+            label="Ticker"
+            variant="outlined"
+            fullWidth
+            value={ticker}
+            onChange={(e) => setTicker(e.target.value)}
+            placeholder="AAPL"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Date"
+            type="date"
+            variant="outlined"
+            fullWidth
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Amount"
+            type="number"
+            variant="outlined"
+            fullWidth
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="5"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="FX"
+            type="number"
+            variant="outlined"
+            fullWidth
+            value={fxForm}
+            onChange={(e) => setFxForm(e.target.value)}
+            placeholder="1"
+          />
+        </Grid>
+      </Grid>
+      <Box display="flex" justifyContent="flex-end">
+        <Button variant="contained" color="primary" onClick={dataPost}>Submit</Button>
+      </Box>
+    </Box>
   );
 };
 

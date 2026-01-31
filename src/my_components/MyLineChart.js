@@ -53,7 +53,12 @@ function MyLineChart(props) {
       },
     },
     xaxis: {
-      categories: props.date
+      categories: props.date,
+      tickAmount: 10,
+      labels: {
+        rotate: -45,
+        trim: true
+      }
     },
     stroke: {
       curve: 'smooth'
@@ -73,8 +78,8 @@ function MyLineChart(props) {
   };
 
   return (
-    <div>
-      <Chart options={options} series={series} type="line" height={350} width={800} />
+    <div style={{ width: "100%" }}>
+      <Chart options={options} series={series} type="line" height={350} width="100%" />
     </div>
   );
 }

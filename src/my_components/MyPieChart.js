@@ -12,23 +12,12 @@ function getRandomColor() {
 
 function Legend({ data }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        paddingTop: "50px",
-        marginLeft: "50px"
-      }}
-    >
+    <div className="pie-legend">
       {data.map((entry, index) => (
-        <div key={index} style={{ display: "flex", alignItems: "center" }}>
-          <div
-            style={{
-              width: "10px",
-              height: "10px",
-              backgroundColor: entry.color,
-              marginRight: "5px",
-            }}
+        <div key={index} className="pie-legend__item">
+          <span
+            className="pie-legend__swatch"
+            style={{ backgroundColor: entry.color }}
           />
           <span>{entry.title}</span>
         </div>
@@ -90,40 +79,37 @@ export default function MyPieChart({ data, height, cb, maxPercentage = 2 }) {
   };
 
   return (
-    <div style={{ display: "flex", height: "300px", flexDirection: "row", borderWidth: 2, borderColor: "black" }}>
-      <div style={{ width: height, margin: "0 auto", flex: "2"}}>
-      <PieChart
-        style={{ height: {height}}}
-        data={pieData.map((entry, index) => ({
-          ...entry,
-          color: colors[index],
-        }))}
-        label={({ dataEntry }) => (dataEntry.value * 100 / total).toFixed(2)}
-        labelStyle={{
-          fontSize: "5px",
-          fontFamily: "sans-serif",
-          fill: "black",
-          color: "black"
-        }}
-        labelPosition={120}
-        radius={30}
-        viewBoxSize={[100, 100]}
-        startAngle={90}
-        onClick={handleClick}
-        segmentsShift={(index) => (index === selected ? 5 : 0)}
-      />
+    <div className="pie-card">
+      <div className="pie-card__chart">
+        <PieChart
+          className="pie-chart"
+          data={pieData.map((entry, index) => ({
+            ...entry,
+            color: colors[index],
+          }))}
+          label={({ dataEntry }) => (dataEntry.value * 100 / total).toFixed(2)}
+          labelStyle={{
+            fontSize: "6px",
+            fontFamily: "sans-serif",
+            fill: "#111827",
+          }}
+          labelPosition={120}
+          radius={36}
+          viewBoxSize={[120, 120]}
+          center={[60, 60]}
+          startAngle={-90}
+          onClick={handleClick}
+          segmentsShift={(index) => (index === selected ? 6 : 0)}
+        />
       </div>
-      <div style={{
-        flex: "3",
-        justifyContent: "left"
-      }}>
-        <Legend data={pieData.map((entry, index) => ({
-          ...entry,
-          color: colors[index],
-          height: {height}
-        }))} />
+      <div className="pie-card__legend">
+        <Legend
+          data={pieData.map((entry, index) => ({
+            ...entry,
+            color: colors[index],
+          }))}
+        />
       </div>
-
     </div>
   );
 }

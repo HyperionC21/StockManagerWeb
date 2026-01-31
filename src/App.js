@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import MyPieChart from './my_components/MyPieChart'
 import MyToggleButton from './my_components/MyToggleButton';
@@ -13,7 +12,7 @@ import MyDiscreteSlider from './my_components/MyDiscreteSlider';
 import { SERVER_ADDRESS } from './my_components/constants.tsx';
 import MyPortfolioTable from './my_components/MyPortfolioTable.js';
 
-const SERVER_PORT = '5001'
+const SERVER_PORT = '5000'
 const STEP = 90
 const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
 const INITIAL_STEP = 90
@@ -97,53 +96,75 @@ function App() {
       });
   }, [selectedOption]);
 
+  const controls = (
+    <div>
+      <h2 className="card__title">Controls</h2>
+      <div className="control-row">
+        <p className="control-row__label">Display Kind</p>
+        <TextPicker
+          style={{ width: "100%" }}
+          options={options}
+          cb={setSelectedOption}
+          className="text-picker"
+        />
+      </div>
+      <div className="control-row">
+        <p className="control-row__label">Performance Chart Toggle</p>
+        <div className="control-row__control">
+          <MyToggleButton cb={setIsAbsolute} />
+        </div>
+      </div>
+      <div className="control-row">
+        <p className="control-row__label">Performance Chart Step</p>
+        <div className="control-row__control control-row__control--wide">
+          <MyDiscreteSlider onChangeStep={setStep} initialValue={INITIAL_STEP} />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-      
-      <div style={{display: "flex", flexDirection: "column", height: "100%", justifyContent: "center"}}>
-        <div style= {{ display: "flex", justifyContent: "center" }}>
-  <MyBottomDrawer/>
-</div>
-    <div style={{display: "flex", flexDirection: "row", flex: "2", borderWidth: "5px", justifyContent: "center"}}>
-      <div style={{flex: "2", justifyContent: "center", paddingLeft: "10%"}}>
-        <MyPieChart height={"250px"} data={data} cb={setFocusedTicker}/>
-      </div>
-      <div style={{flex: "2", justifyContent: "center", marginTop: "5%"}}>
-        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginRight: '2%'}}>
-            <p style={{flex: "2", width: "50%"}}> Display Kind </p>
-            <TextPicker style={{width: "50%", justifyContent: "center", flex: "3"}} options={options} cb={setSelectedOption} className="text-picker"/>
+    <div className="app">
+      <header className="app__header">
+        <div>
+          <h1 className="app__title">Stock Manager</h1>
+          <p className="app__subtitle">Portfolio insights and performance at a glance</p>
         </div>
-        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginRight: '2%'}}>
-            <p style={{flex: "1", width: "50%"}}> Performance Chart Toggle </p>
-            <div style={{marginTop: "2%"}}> 
-              <MyToggleButton cb={setIsAbsolute} />
-            </div>
+        <div className="app__drawer">
+          <MyBottomDrawer controls={controls} />
         </div>
-        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginRight: '2%'}}>
-            <p style={{flex: "1", width: "50%"}}> Performance Chart Step Slider </p>
-            <div style={{marginTop: "2%", width: "50%"}}> 
-              <MyDiscreteSlider onChangeStep={setStep} initialValue={INITIAL_STEP} />
-            </div>
-        </div>
-      </div>
-  </div>
-  <div style= {{ display: "flex", width: "100%", flex: "5", justifyContent: "center", marginTop: "50px", paddingBottom: "100px" }}>
-    <MyLineChart profit={lineData.profit} date={lineData.date} option={focusedTicker}/>
-  </div>
-  <div style={{display: "flex", flexDirection: "row", flex: "2", borderWidth: "5px", justifyContent: "center"}}>
-    <div style={{flex: "7", justifyContent: "center", paddingLeft: "10%", marginTop: "-3%"}}>
-      <SecurityMetrics focusedTicker={focusedTicker} selectedOption={selectedOption} />
-    </div>
-    <div style={{flex: "12", width: "500", justifyContent: "center"}}>
-      <MyTable ticker={focusedTicker} selectedOption={selectedOption} />
-    </div>
-  </div>
-  <div style={{display: "flex", paddingTop: "30px", flexDirection: "row", flex: "2", borderWidth: "5px", justifyContent: "center"}}>
-    <MyPortfolioTable/>
-  </div>
-</div>
+      </header>
 
+      <main className="app__content">
+        <section className="card">
+          <h2 className="card__title">Portfolio Composition</h2>
+          <MyPieChart height={"250px"} data={data} cb={setFocusedTicker} />
+        </section>
 
-    
+        <section className="card">
+          <h2 className="card__title">Performance</h2>
+          <div className="chart-area">
+            <MyLineChart profit={lineData.profit} date={lineData.date} option={focusedTicker} />
+          </div>
+        </section>
+
+        <section className="card card--split">
+          <div className="card__pane">
+            <h2 className="card__title">Security Metrics</h2>
+            <SecurityMetrics focusedTicker={focusedTicker} selectedOption={selectedOption} />
+          </div>
+          <div className="card__pane">
+            <h2 className="card__title">Holdings Detail</h2>
+            <MyTable ticker={focusedTicker} selectedOption={selectedOption} />
+          </div>
+        </section>
+
+        <section className="card">
+          <h2 className="card__title">Portfolio Table</h2>
+          <MyPortfolioTable />
+        </section>
+      </main>
+    </div>
   );
 }
 

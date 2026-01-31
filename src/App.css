@@ -1,44 +1,238 @@
-.App {
-  text-align: center;
+.app {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f5f8ff 0%, #f7f4ff 100%);
+  color: #111827;
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 6vw 12px;
+  gap: 16px;
+}
+
+.app__title {
+  margin: 0;
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.app__subtitle {
+  margin: 6px 0 0;
+  color: #4b5563;
+  font-size: 15px;
+}
+
+.app__drawer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.app__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 6vw 64px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.card--split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.card__pane {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.chart-area {
+  width: 100%;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.control-row__label {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.control-row__control {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.control-row__control--wide {
+  width: 100%;
 }
 
 .text-picker {
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding-top: 50px;
+  margin-top: 6px;
+  margin-bottom: 6px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.pie-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(200px, 1fr);
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  min-height: 320px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #e9eff7;
-  min-height: 100vh;
+.pie-card__chart {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: rgb(0, 0, 0);
+  width: 100%;
+  min-height: 320px;
+  padding: 12px 16px;
 }
 
-.App-link {
-  color: #45af2b;
+.pie-chart {
+  width: min(320px, 100%);
+  height: min(320px, 100%);
+  overflow: visible;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.pie-card__legend {
+  width: 100%;
+  max-height: 260px;
+  overflow: auto;
+  padding-right: 8px;
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pie-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #374151;
+}
+
+.pie-legend__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 4px;
+}
+
+.metrics__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.metrics__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.metrics__title {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.metrics__badge {
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.metrics__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.metrics__item {
+  background: #f9fafb;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metrics__label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.metrics__value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+@media (max-width: 900px) {
+  .app__header {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  to {
-    transform: rotate(360deg);
+
+  .control-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pie-card {
+    grid-template-columns: 1fr;
+  }
+
+  .pie-card__legend {
+    max-height: 200px;
   }
 }
