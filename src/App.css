@@ -430,3 +430,182 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* Benchmark summary strip */
+.benchmark-summary {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 12px 0 8px;
+}
+
+.benchmark-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.benchmark-stat__label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.benchmark-stat__val {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Analytics panel */
+.analytics {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 4px 0;
+}
+
+.analytics__subtitle {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.analytics__subnote {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+  margin-left: 6px;
+}
+
+.analytics__drawdown-note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.analytics-loading {
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Health score */
+.health-score {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.health-grade {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.health-grade--a { background: #16a34a; }
+.health-grade--b { background: #65a30d; }
+.health-grade--c { background: #d97706; }
+.health-grade--d { background: #ea580c; }
+.health-grade--f { background: #dc2626; }
+
+.health-score__detail {
+  flex: 1;
+  min-width: 160px;
+}
+
+.health-score__score {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.health-score__summary {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.health-score__components {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 2;
+  min-width: 220px;
+}
+
+.health-score__component {
+  display: grid;
+  grid-template-columns: 160px 1fr 40px;
+  align-items: center;
+  gap: 8px;
+}
+
+.health-score__component-label {
+  font-size: 12px;
+  color: #374151;
+  text-transform: capitalize;
+}
+
+.health-bar-bg {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.health-bar {
+  height: 100%;
+  background: #4f46e5;
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.health-score__component-score {
+  font-size: 11px;
+  color: #6b7280;
+  text-align: right;
+}
+
+/* Insights */
+.insights {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.insight {
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-left-width: 3px;
+}
+
+.insight__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.insight__detail {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.5;
+}

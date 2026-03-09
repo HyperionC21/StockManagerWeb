@@ -13,6 +13,8 @@ import DividendForm from './my_components/DividendForm';
 
 import { API_BASE_URL } from './my_components/constants.tsx';
 import MyPortfolioTable from './my_components/MyPortfolioTable.js';
+import BenchmarkChart from './my_components/BenchmarkChart';
+import AnalyticsPanel from './my_components/AnalyticsPanel';
 
 const INITIAL_STEP = 90;
 
@@ -190,6 +192,16 @@ function App() {
         <section className="card">
           <h2 className="card__title">Portfolio Table</h2>
           <MyPortfolioTable />
+        </section>
+
+        <section className="card">
+          <h2 className="card__title">Benchmark Comparison</h2>
+          <BenchmarkChart />
+        </section>
+
+        <section className="card">
+          <h2 className="card__title">Portfolio Analytics</h2>
+          <AnalyticsPanel />
         </section>
 
         <section className="card">
