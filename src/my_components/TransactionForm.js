@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, MenuItem, TextField } from '@material-ui/core';
 import { API_BASE_URL } from './constants.tsx';
 
 const TransactionForm = () => {
@@ -50,46 +49,98 @@ const TransactionForm = () => {
       });
   };
 
+  const isError = submitMsg && submitMsg.includes('Error');
+
   return (
-    <Box display="flex" flexDirection="column" gridGap={16}>
-      <Box fontSize={18} fontWeight={600}>New Transaction</Box>
+    <div className="entry-form">
+      <h3 className="entry-form__title">New Transaction</h3>
       {submitMsg && (
-        <Box fontSize={13} color={submitMsg.includes('Error') ? '#dc2626' : '#16a34a'}>
+        <p className={`entry-form__msg ${isError ? 'entry-form__msg--error' : 'entry-form__msg--ok'}`}>
           {submitMsg}
-        </Box>
+        </p>
       )}
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField label="Ticker" variant="outlined" fullWidth value={tickerForm} onChange={(e) => setTickerForm(e.target.value)} placeholder="AAPL" />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField label="Date" type="date" variant="outlined" fullWidth value={dateForm} onChange={(e) => setDateForm(e.target.value)} InputLabelProps={{ shrink: true }} />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Amount" type="number" variant="outlined" fullWidth value={amountForm} onChange={(e) => setAmountForm(e.target.value)} placeholder="5" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Price" type="number" variant="outlined" fullWidth value={priceForm} onChange={(e) => setPriceForm(e.target.value)} placeholder="225.6" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Fee" type="number" variant="outlined" fullWidth value={feeForm} onChange={(e) => setFeeForm(e.target.value)} placeholder="0" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="FX" type="number" variant="outlined" fullWidth value={fxForm} onChange={(e) => setFxForm(e.target.value)} placeholder="1" />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField label="Kind" select variant="outlined" fullWidth value={kindForm} onChange={(e) => setKindForm(e.target.value)}>
-            <MenuItem value="BUY">BUY</MenuItem>
-            <MenuItem value="SELL">SELL</MenuItem>
-          </TextField>
-        </Grid>
-      </Grid>
-      <Box display="flex" justifyContent="flex-end">
-        <Button variant="contained" color="primary" onClick={dataPost} disabled={submitting}>
+      <div className="entry-form__grid">
+        <div className="entry-form__field entry-form__field--full">
+          <label className="entry-form__label">Ticker</label>
+          <input
+            className="entry-form__input"
+            type="text"
+            value={tickerForm}
+            onChange={(e) => setTickerForm(e.target.value)}
+            placeholder="AAPL"
+          />
+        </div>
+        <div className="entry-form__field entry-form__field--full">
+          <label className="entry-form__label">Date</label>
+          <input
+            className="entry-form__input"
+            type="date"
+            value={dateForm}
+            onChange={(e) => setDateForm(e.target.value)}
+          />
+        </div>
+        <div className="entry-form__field">
+          <label className="entry-form__label">Amount</label>
+          <input
+            className="entry-form__input"
+            type="number"
+            value={amountForm}
+            onChange={(e) => setAmountForm(e.target.value)}
+            placeholder="5"
+          />
+        </div>
+        <div className="entry-form__field">
+          <label className="entry-form__label">Price</label>
+          <input
+            className="entry-form__input"
+            type="number"
+            value={priceForm}
+            onChange={(e) => setPriceForm(e.target.value)}
+            placeholder="225.6"
+          />
+        </div>
+        <div className="entry-form__field">
+          <label className="entry-form__label">Fee</label>
+          <input
+            className="entry-form__input"
+            type="number"
+            value={feeForm}
+            onChange={(e) => setFeeForm(e.target.value)}
+            placeholder="0"
+          />
+        </div>
+        <div className="entry-form__field">
+          <label className="entry-form__label">FX</label>
+          <input
+            className="entry-form__input"
+            type="number"
+            value={fxForm}
+            onChange={(e) => setFxForm(e.target.value)}
+            placeholder="1"
+          />
+        </div>
+        <div className="entry-form__field entry-form__field--full">
+          <label className="entry-form__label">Kind</label>
+          <select
+            className="entry-form__select"
+            value={kindForm}
+            onChange={(e) => setKindForm(e.target.value)}
+          >
+            <option value="BUY">BUY</option>
+            <option value="SELL">SELL</option>
+          </select>
+        </div>
+      </div>
+      <div className="entry-form__footer">
+        <button
+          className="entry-form__submit"
+          onClick={dataPost}
+          disabled={submitting}
+        >
           {submitting ? 'Submitting...' : 'Submit'}
-        </Button>
-      </Box>
-    </Box>
+        </button>
+      </div>
+    </div>
   );
 };
 
