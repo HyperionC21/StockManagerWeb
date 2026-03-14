@@ -9,23 +9,35 @@ import MyLineChart from './my_components/MyLineChart';
 import MyTable from './my_components/MyTable';
 import MyDiscreteSlider from './my_components/MyDiscreteSlider';
 
-import { SERVER_ADDRESS } from './my_components/constants.tsx';
+import { API_BASE_URL } from './my_components/constants.tsx';
 import MyPortfolioTable from './my_components/MyPortfolioTable.js';
 
-const SERVER_PORT = '5000'
-const STEP = 90
-const SERVER_URL = `http://${SERVER_ADDRESS}:${SERVER_PORT}/`
-const INITIAL_STEP = 90
+const INITIAL_STEP = 90;
+
+const TIME_PERIODS = [
+  { value: '', label: 'All' },
+  { value: '1W', label: '1W' },
+  { value: '1M', label: '1M' },
+  { value: '1Q', label: '1Q' },
+  { value: '6M', label: '6M' },
+  { value: '1Y', label: '1Y' },
+  { value: 'YTD', label: 'YTD' },
+  { value: '3Y', label: '3Y' },
+  { value: '5Y', label: '5Y' },
+];
 
 function App() {
 
   const [isAbsolute, setIsAbsolute] = useState(false);
   const [data, setData] = useState([]);
   const [lineData, setLineData] = useState({
-    'date' : ['2023-may-15'],
-    'profit' : [1241]
+    'date' : [],
+    'profit' : []
   });
   const [isLineLoading, setIsLineLoading] = useState(false);
+  const [perfError, setPerfError] = useState(null);
+  const [compError, setCompError] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState('');
   const options = [
     { value: 'TICKER', label: 'TICKER' },
     { value: 'COUNTRY', label: 'COUNTRY' },
@@ -37,68 +49,59 @@ function App() {
 
   const [step, setStep] = React.useState(INITIAL_STEP);
 
-
-
   useEffect(() => {
-
     setIsLineLoading(true);
+    setPerfError(null);
 
-    var searchParams = new URLSearchParams({
-      filter_kind: selectedOption,
-      filters: focusedTicker,
-      step: step,
-      kind: isAbsolute ? 'Absolute' : 'Percentage'
-    });
-
-    if (focusedTicker === 'ALL') {
-      searchParams = new URLSearchParams({
-        step: step,
-        kind: isAbsolute ? 'Absolute' : 'Percentage'
-      });
+    const params = { step, kind: isAbsolute ? 'Absolute' : 'Percentage' };
+    if (focusedTicker !== 'ALL') {
+      params.filter_kind = selectedOption;
+      params.filters = focusedTicker;
     }
+    if (selectedPeriod) {
+      params.default_interval = selectedPeriod;
+    }
+    const searchParams = new URLSearchParams(params);
 
-    fetch(`http://${SERVER_ADDRESS}:${SERVER_PORT}/performance?` + searchParams)
-      .then((response) => response.json())
+    fetch(`${API_BASE_URL}/performance?` + searchParams)
+      .then((response) => {
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        return response.json();
+      })
       .then((res_val) => {
-
         const dateSeries = Object.values(res_val.date);
         const profitSeries = Object.values(res_val.profit);
-        const colorSeries = profitSeries.map((value) => {
-          // If the value is positive, set the color to green; if negative, set it to red; otherwise, set it to black (or any other color of your choice)
-          return value > 0 ? 'green' : value < 0 ? 'red' : 'black';
-        });
-        
-        setLineData({
-          'date' : dateSeries,
-          'profit' : profitSeries 
-        });
+        setLineData({ 'date' : dateSeries, 'profit' : profitSeries });
       })
       .finally(() => {
         setIsLineLoading(false);
       })
       .catch((error) => {
-        // Handle any errors here
-        console.log(error);
+        console.error('Performance fetch error:', error);
+        setPerfError('Failed to load performance data');
+      })
+      .finally(() => {
+        setIsLineLoading(false);
       });
-  }, [focusedTicker, isAbsolute, step]);
+  }, [focusedTicker, isAbsolute, step, selectedOption, selectedPeriod]);
 
-    // Fetch the data from the API when the component mounts
   useEffect(() => {
-    fetch(`http://${SERVER_ADDRESS}:${SERVER_PORT}/composition?hue=${selectedOption}`)
-      .then((response) => response.json())
+    setCompError(null);
+    fetch(`${API_BASE_URL}/composition?hue=${selectedOption}`)
+      .then((response) => {
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        return response.json();
+      })
       .then((json) => {
-        // Map the json to the format that Recharts expects
-        console.log(json);
         const mappedData = Object.keys(json.LABEL).map((key) => ({
           name: json.LABEL[key],
           value: json.VALUE[key]
         }));
-        // Set the state variable with the mapped data
         setData(mappedData);
       })
       .catch((error) => {
-        // Handle any errors here
-        console.log(error);
+        console.error('Composition fetch error:', error);
+        setCompError('Failed to load composition data');
       });
   }, [selectedOption]);
 
@@ -113,6 +116,22 @@ function App() {
           cb={setSelectedOption}
           className="text-picker"
         />
+      </div>
+      <div className="control-row">
+        <p className="control-row__label">Time Period</p>
+        <div className="control-row__control">
+          <div className="period-selector">
+            {TIME_PERIODS.map((p) => (
+              <button
+                key={p.value}
+                className={`period-btn${selectedPeriod === p.value ? ' period-btn--active' : ''}`}
+                onClick={() => setSelectedPeriod(p.value)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
       <div className="control-row">
         <p className="control-row__label">Performance Chart Toggle</p>
@@ -144,18 +163,26 @@ function App() {
       <main className="app__content">
         <section className="card">
           <h2 className="card__title">Portfolio Composition</h2>
-          <MyPieChart height={"250px"} data={data} cb={setFocusedTicker} />
+          {compError ? (
+            <div className="error-banner">{compError}</div>
+          ) : (
+            <MyPieChart height={"250px"} data={data} cb={setFocusedTicker} />
+          )}
         </section>
 
         <section className="card">
           <h2 className="card__title">Performance</h2>
           <div className="chart-area">
-            <MyLineChart
-              profit={lineData.profit}
-              date={lineData.date}
-              option={focusedTicker}
-              loading={isLineLoading}
-            />
+            {perfError ? (
+              <div className="error-banner">{perfError}</div>
+            ) : (
+              <MyLineChart
+                profit={lineData.profit}
+                date={lineData.date}
+                option={focusedTicker}
+                loading={isLineLoading}
+              />
+            )}
           </div>
         </section>
 
