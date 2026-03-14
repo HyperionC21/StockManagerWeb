@@ -11,6 +11,7 @@ import MyDiscreteSlider from './my_components/MyDiscreteSlider';
 
 import { API_BASE_URL } from './my_components/constants.tsx';
 import MyPortfolioTable from './my_components/MyPortfolioTable.js';
+import MyDividendChart from './my_components/MyDividendChart.js';
 
 const INITIAL_STEP = 90;
 
@@ -184,6 +185,11 @@ function App() {
               />
             )}
           </div>
+        </section>
+
+        <section className="card">
+          <h2 className="card__title">Dividend Distribution</h2>
+          <MyDividendChart />
         </section>
 
         <section className="card card--split">

@@ -289,6 +289,60 @@
   border-color: #4f46e5;
 }
 
+/* Dividend chart */
+.div-chart__loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #4b5563;
+  padding: 24px 0;
+}
+
+.div-chart__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.div-chart__stats {
+  display: flex;
+  gap: 20px;
+}
+
+.div-chart__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.div-chart__stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+}
+
+.div-chart__stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.div-chart__plot {
+  margin: 0 -8px;
+}
+
+.div-chart__empty {
+  padding: 32px 0;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
 @media (max-width: 900px) {
   .app__header {
     flex-direction: column;
