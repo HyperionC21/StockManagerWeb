@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, MenuItem, TextField } from '@material-ui/core';
 import { API_BASE_URL } from './constants.tsx';
+import './FormStyles.css';
 
 const TransactionForm = () => {
   const [tickerForm, setTickerForm] = useState('');
@@ -14,82 +14,89 @@ const TransactionForm = () => {
   const [submitMsg, setSubmitMsg] = useState(null);
 
   const dataPost = () => {
-    const data = {
-      ticker: tickerForm,
-      date: dateForm,
-      amount: amountForm,
-      kind: kindForm,
-      fx: fxForm,
-      fee: feeForm,
-      price: priceForm
-    };
-
+    const data = { ticker: tickerForm, date: dateForm, amount: amountForm, kind: kindForm, fx: fxForm, fee: feeForm, price: priceForm };
     setSubmitting(true);
     setSubmitMsg(null);
-
     fetch(`${API_BASE_URL}/new_transaction`, {
-      method: "POST",
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to submit');
         setSubmitMsg('Transaction added successfully');
-        setTickerForm('');
-        setAmountForm('');
-        setDateForm('');
-        setPriceForm('');
-        setFeeForm('');
-        setFxForm('');
+        setTickerForm(''); setAmountForm(''); setDateForm(''); setPriceForm(''); setFeeForm(''); setFxForm('');
       })
-      .catch(() => {
-        setSubmitMsg('Error submitting transaction');
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+      .catch(() => setSubmitMsg('Error submitting transaction'))
+      .finally(() => setSubmitting(false));
   };
 
   return (
-    <Box display="flex" flexDirection="column" gridGap={16}>
-      <Box fontSize={18} fontWeight={600}>New Transaction</Box>
+    <div className="form-card">
+      <p className="form-title">New Transaction</p>
+
       {submitMsg && (
-        <Box fontSize={13} color={submitMsg.includes('Error') ? '#dc2626' : '#16a34a'}>
+        <div className={`form-msg ${submitMsg.includes('Error') ? 'form-msg--error' : 'form-msg--success'}`}>
           {submitMsg}
-        </Box>
+        </div>
       )}
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField label="Ticker" variant="outlined" fullWidth value={tickerForm} onChange={(e) => setTickerForm(e.target.value)} placeholder="AAPL" />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField label="Date" type="date" variant="outlined" fullWidth value={dateForm} onChange={(e) => setDateForm(e.target.value)} InputLabelProps={{ shrink: true }} />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Amount" type="number" variant="outlined" fullWidth value={amountForm} onChange={(e) => setAmountForm(e.target.value)} placeholder="5" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Price" type="number" variant="outlined" fullWidth value={priceForm} onChange={(e) => setPriceForm(e.target.value)} placeholder="225.6" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Fee" type="number" variant="outlined" fullWidth value={feeForm} onChange={(e) => setFeeForm(e.target.value)} placeholder="0" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="FX" type="number" variant="outlined" fullWidth value={fxForm} onChange={(e) => setFxForm(e.target.value)} placeholder="1" />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField label="Kind" select variant="outlined" fullWidth value={kindForm} onChange={(e) => setKindForm(e.target.value)}>
-            <MenuItem value="BUY">BUY</MenuItem>
-            <MenuItem value="SELL">SELL</MenuItem>
-          </TextField>
-        </Grid>
-      </Grid>
-      <Box display="flex" justifyContent="flex-end">
-        <Button variant="contained" color="primary" onClick={dataPost} disabled={submitting}>
-          {submitting ? 'Submitting...' : 'Submit'}
-        </Button>
-      </Box>
-    </Box>
+
+      <div className="form-row">
+        <label className="form-label">Ticker</label>
+        <input className="form-input" placeholder="AAPL" value={tickerForm} onChange={e => setTickerForm(e.target.value)} />
+      </div>
+
+      <div className="form-row">
+        <label className="form-label">Date</label>
+        <input className="form-input" type="date" value={dateForm} onChange={e => setDateForm(e.target.value)} />
+      </div>
+
+      <div className="form-grid-2">
+        <div className="form-row">
+          <label className="form-label">Amount</label>
+          <input className="form-input" type="number" placeholder="5" value={amountForm} onChange={e => setAmountForm(e.target.value)} />
+        </div>
+        <div className="form-row">
+          <label className="form-label">Price</label>
+          <input className="form-input" type="number" placeholder="225.6" value={priceForm} onChange={e => setPriceForm(e.target.value)} />
+        </div>
+      </div>
+
+      <div className="form-grid-2">
+        <div className="form-row">
+          <label className="form-label">Fee</label>
+          <input className="form-input" type="number" placeholder="0" value={feeForm} onChange={e => setFeeForm(e.target.value)} />
+        </div>
+        <div className="form-row">
+          <label className="form-label">FX</label>
+          <input className="form-input" type="number" placeholder="1" value={fxForm} onChange={e => setFxForm(e.target.value)} />
+        </div>
+      </div>
+
+      <div className="form-row">
+        <label className="form-label">Kind</label>
+        <div className="form-toggle">
+          <button
+            className={`form-toggle__btn${kindForm === 'BUY' ? ' form-toggle__btn--active-buy' : ''}`}
+            onClick={() => setKindForm('BUY')}
+          >
+            BUY
+          </button>
+          <button
+            className={`form-toggle__btn${kindForm === 'SELL' ? ' form-toggle__btn--active-sell' : ''}`}
+            onClick={() => setKindForm('SELL')}
+          >
+            SELL
+          </button>
+        </div>
+      </div>
+
+      <div className="form-actions">
+        <button className="form-button" onClick={dataPost} disabled={submitting}>
+          {submitting ? 'Submitting…' : 'Submit'}
+        </button>
+      </div>
+    </div>
   );
 };
 

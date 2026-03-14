@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, TextField } from '@material-ui/core';
 import { API_BASE_URL } from './constants.tsx';
+import './FormStyles.css';
 
 const DividendForm = () => {
   const [ticker, setTicker] = useState('');
@@ -11,65 +11,60 @@ const DividendForm = () => {
   const [submitMsg, setSubmitMsg] = useState(null);
 
   const dataPost = () => {
-    const data = {
-      ticker: ticker,
-      date: date,
-      amount: amount,
-      fx: fxForm,
-    };
-
+    const data = { ticker, date, amount, fx: fxForm };
     setSubmitting(true);
     setSubmitMsg(null);
-
     fetch(`${API_BASE_URL}/new_dividend`, {
-      method: "POST",
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to submit');
         setSubmitMsg('Dividend added successfully');
-        setTicker('');
-        setAmount('');
-        setDate('');
-        setFxForm('');
+        setTicker(''); setAmount(''); setDate(''); setFxForm('');
       })
-      .catch(() => {
-        setSubmitMsg('Error submitting dividend');
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+      .catch(() => setSubmitMsg('Error submitting dividend'))
+      .finally(() => setSubmitting(false));
   };
 
   return (
-    <Box display="flex" flexDirection="column" gridGap={16}>
-      <Box fontSize={18} fontWeight={600}>New Dividend</Box>
+    <div className="form-card">
+      <p className="form-title">New Dividend</p>
+
       {submitMsg && (
-        <Box fontSize={13} color={submitMsg.includes('Error') ? '#dc2626' : '#16a34a'}>
+        <div className={`form-msg ${submitMsg.includes('Error') ? 'form-msg--error' : 'form-msg--success'}`}>
           {submitMsg}
-        </Box>
+        </div>
       )}
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField label="Ticker" variant="outlined" fullWidth value={ticker} onChange={(e) => setTicker(e.target.value)} placeholder="AAPL" />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField label="Date" type="date" variant="outlined" fullWidth value={date} onChange={(e) => setDate(e.target.value)} InputLabelProps={{ shrink: true }} />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="Amount" type="number" variant="outlined" fullWidth value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="5" />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField label="FX" type="number" variant="outlined" fullWidth value={fxForm} onChange={(e) => setFxForm(e.target.value)} placeholder="1" />
-        </Grid>
-      </Grid>
-      <Box display="flex" justifyContent="flex-end">
-        <Button variant="contained" color="primary" onClick={dataPost} disabled={submitting}>
-          {submitting ? 'Submitting...' : 'Submit'}
-        </Button>
-      </Box>
-    </Box>
+
+      <div className="form-row">
+        <label className="form-label">Ticker</label>
+        <input className="form-input" placeholder="AAPL" value={ticker} onChange={e => setTicker(e.target.value)} />
+      </div>
+
+      <div className="form-row">
+        <label className="form-label">Date</label>
+        <input className="form-input" type="date" value={date} onChange={e => setDate(e.target.value)} />
+      </div>
+
+      <div className="form-grid-2">
+        <div className="form-row">
+          <label className="form-label">Amount</label>
+          <input className="form-input" type="number" placeholder="5" value={amount} onChange={e => setAmount(e.target.value)} />
+        </div>
+        <div className="form-row">
+          <label className="form-label">FX</label>
+          <input className="form-input" type="number" placeholder="1" value={fxForm} onChange={e => setFxForm(e.target.value)} />
+        </div>
+      </div>
+
+      <div className="form-actions">
+        <button className="form-button" onClick={dataPost} disabled={submitting}>
+          {submitting ? 'Submitting…' : 'Submit'}
+        </button>
+      </div>
+    </div>
   );
 };
 
