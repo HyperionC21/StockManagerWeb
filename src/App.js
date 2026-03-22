@@ -14,7 +14,6 @@ import { API_BASE_URL } from './my_components/constants.tsx';
 import MyPortfolioTable from './my_components/MyPortfolioTable.js';
 import BenchmarkChart from './my_components/BenchmarkChart';
 import AnalyticsPanel from './my_components/AnalyticsPanel';
-import BETTrackingCard from './my_components/BETTrackingCard';
 
 const INITIAL_STEP = 90;
 
@@ -200,12 +199,6 @@ function App() {
         <section className="card">
           <h2 className="card__title">Benchmark Comparison</h2>
           <BenchmarkChart selectedPeriod={selectedPeriod} />
-        </section>
-
-        <section className="card">
-          <h2 className="card__title">BET Index Tracking</h2>
-          <p className="card__subtitle">Top-10 BET constituents vs your Romanian holdings</p>
-          <BETTrackingCard />
         </section>
 
         <section className="card">
