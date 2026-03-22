@@ -71,6 +71,7 @@ function BETTrackingCardInner() {
     legend: { position: 'top' },
     tooltip: {
       shared: true,
+      intersect: false,
       y: { formatter: (v) => (v != null && !isNaN(v) ? Number(v).toFixed(2) + '%' : '') },
     },
   };
