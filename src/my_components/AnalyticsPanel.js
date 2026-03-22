@@ -12,11 +12,47 @@ const SEVERITY_COLORS = {
 const safeNum = (v) =>
   v !== null && v !== undefined ? Number(v).toFixed(2) : 'N/A';
 
+const METRIC_TOOLTIPS = {
+  sharpe_ratio:
+    'Return earned per unit of total risk. Above 1 is good, above 2 is excellent. Negative means underperforming a risk-free asset.',
+  sortino_ratio:
+    'Like Sharpe, but only penalises downside volatility. Better reflects risk for investors who don\'t mind upside swings.',
+  volatility_pct:
+    'Annualised standard deviation of returns. Higher means wider swings — both up and down.',
+  max_drawdown:
+    'Largest peak-to-trough drop in portfolio value. Shows the worst-case loss experienced in the period.',
+  beta:
+    'Sensitivity to market moves vs the benchmark. Beta > 1 means more volatile than the market; < 1 means more stable.',
+  alpha_pct:
+    'Excess return above what Beta predicts (Jensen\'s Alpha). Positive alpha means genuine outperformance after adjusting for risk taken.',
+  calmar_ratio:
+    'Annualised return divided by max drawdown. Higher is better — rewards strong returns achieved without deep losses.',
+  treynor_ratio:
+    'Return earned per unit of market risk (Beta). Like Sharpe but uses systematic risk only — useful for diversified portfolios.',
+};
+
+function MetricItem({ label, value, tooltipKey }) {
+  return (
+    <div className="metrics__item">
+      <span className="metrics__label">
+        {label}
+        {METRIC_TOOLTIPS[tooltipKey] && (
+          <span className="metric-tooltip">
+            <span className="metric-tooltip__icon">?</span>
+            <span className="metric-tooltip__box">{METRIC_TOOLTIPS[tooltipKey]}</span>
+          </span>
+        )}
+      </span>
+      <span className="metrics__value">{value}</span>
+    </div>
+  );
+}
+
 function capitalizeLabel(key) {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function AnalyticsPanel() {
+function AnalyticsPanel({ selectedPeriod }) {
   const [healthScore, setHealthScore] = useState(null);
   const [riskMetrics, setRiskMetrics] = useState(null);
   const [insights, setInsights] = useState(null);
@@ -29,12 +65,18 @@ function AnalyticsPanel() {
     setLoading(true);
     setError(null);
 
+    const riskParams = new URLSearchParams({ step: 7 });
+    if (selectedPeriod) riskParams.set('default_interval', selectedPeriod);
+
+    const healthParams = new URLSearchParams();
+    if (selectedPeriod) healthParams.set('period', selectedPeriod);
+
     Promise.all([
-      fetch(`${API_BASE_URL}/health_score`).then((r) => {
+      fetch(`${API_BASE_URL}/health_score?` + healthParams).then((r) => {
         if (!r.ok) throw new Error(`health_score: ${r.status}`);
         return r.json();
       }),
-      fetch(`${API_BASE_URL}/risk_metrics`).then((r) => {
+      fetch(`${API_BASE_URL}/risk_metrics?` + riskParams).then((r) => {
         if (!r.ok) throw new Error(`risk_metrics: ${r.status}`);
         return r.json();
       }),
@@ -61,7 +103,7 @@ function AnalyticsPanel() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [selectedPeriod]);
 
   if (loading) {
     return <p className="analytics-loading">Computing analytics...</p>;
@@ -122,50 +164,26 @@ function AnalyticsPanel() {
           )}
         </p>
         <div className="metrics__grid">
-          <div className="metrics__item">
-            <span className="metrics__label">Sharpe Ratio</span>
-            <span className="metrics__value">{safeNum(riskMetrics?.sharpe_ratio)}</span>
-          </div>
-          <div className="metrics__item">
-            <span className="metrics__label">Sortino Ratio</span>
-            <span className="metrics__value">{safeNum(riskMetrics?.sortino_ratio)}</span>
-          </div>
-          <div className="metrics__item">
-            <span className="metrics__label">Volatility</span>
-            <span className="metrics__value">
-              {riskMetrics?.volatility_pct != null
-                ? `${safeNum(riskMetrics.volatility_pct)}%`
-                : 'N/A'}
-            </span>
-          </div>
-          <div className="metrics__item">
-            <span className="metrics__label">Max Drawdown</span>
-            <span className="metrics__value">
-              {drawdown?.max_drawdown_pct != null
-                ? `${safeNum(drawdown.max_drawdown_pct)}%`
-                : 'N/A'}
-            </span>
-          </div>
-          <div className="metrics__item">
-            <span className="metrics__label">Beta</span>
-            <span className="metrics__value">{safeNum(riskMetrics?.beta)}</span>
-          </div>
-          <div className="metrics__item">
-            <span className="metrics__label">Alpha</span>
-            <span className="metrics__value">
-              {riskMetrics?.alpha_pct != null
-                ? `${safeNum(riskMetrics.alpha_pct)}%`
-                : 'N/A'}
-            </span>
-          </div>
-          <div className="metrics__item">
-            <span className="metrics__label">Calmar Ratio</span>
-            <span className="metrics__value">{safeNum(riskMetrics?.calmar_ratio)}</span>
-          </div>
-          <div className="metrics__item">
-            <span className="metrics__label">Treynor Ratio</span>
-            <span className="metrics__value">{safeNum(riskMetrics?.treynor_ratio)}</span>
-          </div>
+          <MetricItem label="Sharpe Ratio" tooltipKey="sharpe_ratio" value={safeNum(riskMetrics?.sharpe_ratio)} />
+          <MetricItem label="Sortino Ratio" tooltipKey="sortino_ratio" value={safeNum(riskMetrics?.sortino_ratio)} />
+          <MetricItem
+            label="Volatility"
+            tooltipKey="volatility_pct"
+            value={riskMetrics?.volatility_pct != null ? `${safeNum(riskMetrics.volatility_pct)}%` : 'N/A'}
+          />
+          <MetricItem
+            label="Max Drawdown"
+            tooltipKey="max_drawdown"
+            value={drawdown?.max_drawdown_pct != null ? `${safeNum(drawdown.max_drawdown_pct)}%` : 'N/A'}
+          />
+          <MetricItem label="Beta" tooltipKey="beta" value={safeNum(riskMetrics?.beta)} />
+          <MetricItem
+            label="Alpha"
+            tooltipKey="alpha_pct"
+            value={riskMetrics?.alpha_pct != null ? `${safeNum(riskMetrics.alpha_pct)}%` : 'N/A'}
+          />
+          <MetricItem label="Calmar Ratio" tooltipKey="calmar_ratio" value={safeNum(riskMetrics?.calmar_ratio)} />
+          <MetricItem label="Treynor Ratio" tooltipKey="treynor_ratio" value={safeNum(riskMetrics?.treynor_ratio)} />
         </div>
         {drawdown?.peak_date && drawdown?.trough_date && (
           <p className="analytics__drawdown-note">

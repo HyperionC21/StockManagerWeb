@@ -11,9 +11,10 @@ const BENCHMARKS = [
   { value: 'AGG', label: 'Bonds' },
 ];
 
-function BenchmarkChart() {
-  const [selectedBenchmark, setSelectedBenchmark] = useState('SPY');
-  const [chartData, setChartData] = useState(null);
+const BENCHMARK_COLORS = ['#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#f97316', '#06b6d4'];
+
+function BenchmarkChart({ selectedPeriod }) {
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -22,39 +23,43 @@ function BenchmarkChart() {
 
     setLoading(true);
     setError(null);
-    setChartData(null);
+    setResults([]);
 
-    fetch(`${API_BASE_URL}/benchmark?benchmark=${selectedBenchmark}&step=7`)
-      .then((response) => {
-        if (!response.ok) throw new Error(`Server error: ${response.status}`);
-        return response.json();
-      })
-      .then((json) => {
-        if (cancelled) return;
-        if (json.error) {
-          setError(json.error);
-        } else {
-          setChartData(json);
-        }
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        console.error('Benchmark fetch error:', err);
-        setError('Failed to load benchmark data');
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
+    const fetchOne = (ticker) => {
+      const params = new URLSearchParams({ benchmark: ticker, step: 7 });
+      if (selectedPeriod) params.set('default_interval', selectedPeriod);
+      return fetch(`${API_BASE_URL}/benchmark?` + params)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((json) => (json.error ? null : { ticker, ...json }))
+        .catch(() => null);
     };
-  }, [selectedBenchmark]);
 
-  const series = chartData
+    Promise.all(BENCHMARKS.map((b) => fetchOne(b.value))).then((all) => {
+      if (cancelled) return;
+      const valid = all.filter(Boolean);
+      if (valid.length === 0) {
+        setError('Failed to load benchmark data');
+      } else {
+        setResults(valid);
+      }
+      setLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  }, [selectedPeriod]);
+
+  const first = results[0];
+  const dates = first ? first.dates : [];
+  const portfolioReturn = first ? first.portfolio_return : [];
+  const portfolioTotal = first ? first.portfolio_total_return : null;
+
+  const series = results.length
     ? [
-        { name: 'Portfolio', data: chartData.portfolio_return },
-        { name: chartData.benchmark_name, data: chartData.benchmark_return },
+        { name: 'Portfolio', data: portfolioReturn },
+        ...results.map((r, i) => ({
+          name: BENCHMARKS.find((b) => b.value === r.ticker)?.label ?? r.ticker,
+          data: r.benchmark_return,
+        })),
       ]
     : [];
 
@@ -62,114 +67,64 @@ function BenchmarkChart() {
     chart: {
       id: 'benchmark-chart',
       toolbar: { show: false },
+      zoom: { enabled: false },
     },
-    colors: ['#4f46e5', '#f59e0b'],
-    stroke: {
-      curve: 'smooth',
-      width: 2,
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    legend: {
-      position: 'top',
-    },
+    colors: ['#4f46e5', ...BENCHMARK_COLORS],
+    stroke: { curve: 'smooth', width: 2 },
+    dataLabels: { enabled: false },
+    legend: { position: 'top' },
     xaxis: {
-      categories: chartData ? chartData.dates : [],
+      categories: dates,
       tickAmount: 10,
-      labels: {
-        rotate: -45,
-      },
+      labels: { rotate: -45 },
     },
     yaxis: {
-      labels: {
-        formatter: (v) => v?.toFixed(1) + '%',
-      },
+      labels: { formatter: (v) => v?.toFixed(1) + '%' },
     },
     tooltip: {
-      y: {
-        formatter: (v) => v?.toFixed(2) + '%',
-      },
+      y: { formatter: (v) => v?.toFixed(2) + '%' },
     },
   };
 
-  const outperformance = chartData ? chartData.outperformance : null;
-  const outperformancePositive = outperformance !== null && outperformance >= 0;
-
   return (
     <div>
-      <div className="period-selector" style={{ paddingBottom: '12px' }}>
-        {BENCHMARKS.map((b) => (
-          <button
-            key={b.value}
-            className={`period-btn${selectedBenchmark === b.value ? ' period-btn--active' : ''}`}
-            onClick={() => setSelectedBenchmark(b.value)}
-          >
-            {b.label}
-          </button>
-        ))}
-      </div>
-
       {error ? (
         <div className="error-banner">{error}</div>
       ) : (
         <>
-          {chartData && (
+          {results.length > 0 && (
             <div className="benchmark-summary">
               <div className="benchmark-stat">
                 <span className="benchmark-stat__label">Portfolio</span>
-                <span
-                  className={`benchmark-stat__val ${
-                    chartData.portfolio_total_return >= 0
-                      ? 'metrics__value--positive'
-                      : 'metrics__value--negative'
-                  }`}
-                >
-                  {chartData.portfolio_total_return >= 0 ? '+' : ''}
-                  {chartData.portfolio_total_return?.toFixed(2)}%
+                <span className={`benchmark-stat__val ${portfolioTotal >= 0 ? 'metrics__value--positive' : 'metrics__value--negative'}`}>
+                  {portfolioTotal >= 0 ? '+' : ''}{portfolioTotal?.toFixed(2)}%
                 </span>
               </div>
-              <div className="benchmark-stat">
-                <span className="benchmark-stat__label">{chartData.benchmark_name}</span>
-                <span
-                  className={`benchmark-stat__val ${
-                    chartData.benchmark_total_return >= 0
-                      ? 'metrics__value--positive'
-                      : 'metrics__value--negative'
-                  }`}
-                >
-                  {chartData.benchmark_total_return >= 0 ? '+' : ''}
-                  {chartData.benchmark_total_return?.toFixed(2)}%
-                </span>
-              </div>
-              <div className="benchmark-stat">
-                <span className="benchmark-stat__label">Outperformance</span>
-                <span
-                  className={`benchmark-stat__val ${
-                    outperformancePositive
-                      ? 'metrics__value--positive'
-                      : 'metrics__value--negative'
-                  }`}
-                >
-                  {outperformancePositive ? '+' : ''}
-                  {outperformance?.toFixed(2)}%
-                </span>
-              </div>
+              {results.map((r, i) => {
+                const outperf = r.portfolio_total_return - r.benchmark_total_return;
+                return (
+                  <div key={r.ticker} className="benchmark-stat">
+                    <span className="benchmark-stat__label" style={{ color: BENCHMARK_COLORS[i] }}>
+                      {BENCHMARKS.find((b) => b.value === r.ticker)?.label ?? r.ticker}
+                    </span>
+                    <span className={`benchmark-stat__val ${r.benchmark_total_return >= 0 ? 'metrics__value--positive' : 'metrics__value--negative'}`}>
+                      {r.benchmark_total_return >= 0 ? '+' : ''}{r.benchmark_total_return?.toFixed(2)}%
+                    </span>
+                    <span className={`benchmark-stat__sub ${outperf >= 0 ? 'metrics__value--positive' : 'metrics__value--negative'}`}>
+                      {outperf >= 0 ? '+' : ''}{outperf.toFixed(2)}% vs portfolio
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
 
           <div className="performance-chart" style={{ position: 'relative' }}>
-            <Chart
-              options={options}
-              series={series}
-              type="line"
-              height={350}
-              width="100%"
-            />
+            <Chart options={options} series={series} type="line" height={350} width="100%" />
             {loading && (
               <div className="chart-loading">
                 <div className="chart-loading__spinner" />
-                Updating chart...
+                Loading benchmarks...
               </div>
             )}
           </div>

@@ -3,7 +3,6 @@ import MyPieChart from './my_components/MyPieChart'
 import MyToggleButton from './my_components/MyToggleButton';
 import React, { useEffect, useState } from "react";
 import TextPicker from './my_components/TextPicker';
-import MyBottomDrawer from './my_components/MyBottomDrawer';
 import SecurityMetrics from './my_components/SecurityMetrics';
 import MyLineChart from './my_components/MyLineChart';
 import MyTable from './my_components/MyTable';
@@ -106,36 +105,26 @@ function App() {
       });
   }, [selectedOption]);
 
-  const controls = (
-    <div>
-      <h2 className="card__title">View Settings</h2>
-      <div className="control-row">
-        <p className="control-row__label">Group By</p>
-        <TextPicker
-          style={{ width: "100%" }}
-          options={options}
-          cb={setSelectedOption}
-          className="text-picker"
-        />
-      </div>
-    </div>
-  );
-
   return (
     <div className="app">
       <header className="app__header">
-        <div>
-          <h1 className="app__title">Stock Manager</h1>
-          <p className="app__subtitle">Portfolio insights and performance at a glance</p>
-        </div>
-        <div className="app__drawer">
-          <MyBottomDrawer controls={controls} />
-        </div>
+        <h1 className="app__title">Stock Manager</h1>
+        <p className="app__subtitle">Portfolio insights and performance at a glance</p>
       </header>
 
       <main className="app__content">
         <section className="card">
-          <h2 className="card__title">Portfolio Composition</h2>
+          <div className="card__title-row">
+            <h2 className="card__title">Portfolio Composition</h2>
+            <div className="control-row">
+              <p className="control-row__label">Group By</p>
+              <TextPicker
+                options={options}
+                cb={setSelectedOption}
+                className="text-picker"
+              />
+            </div>
+          </div>
           {compError ? (
             <div className="error-banner">{compError}</div>
           ) : (
@@ -146,19 +135,28 @@ function App() {
         <section className="card">
           <h2 className="card__title">Performance</h2>
           <div className="perf-controls">
-            <div className="period-selector">
-              {TIME_PERIODS.map((p) => (
-                <button
-                  key={p.value}
-                  className={`period-btn${selectedPeriod === p.value ? ' period-btn--active' : ''}`}
-                  onClick={() => setSelectedPeriod(p.value)}
-                >
-                  {p.label}
-                </button>
-              ))}
+            <div className="perf-control-group">
+              <span className="perf-control-group__label">Period</span>
+              <div className="period-selector">
+                {TIME_PERIODS.map((p) => (
+                  <button
+                    key={p.value}
+                    className={`period-btn${selectedPeriod === p.value ? ' period-btn--active' : ''}`}
+                    onClick={() => setSelectedPeriod(p.value)}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <MyToggleButton cb={setIsAbsolute} />
-            <MyDiscreteSlider onChangeStep={setStep} initialValue={INITIAL_STEP} />
+            <div className="perf-control-group">
+              <span className="perf-control-group__label">Values</span>
+              <MyToggleButton cb={setIsAbsolute} value={isAbsolute} />
+            </div>
+            <div className="perf-control-group">
+              <span className="perf-control-group__label">Interval</span>
+              <MyDiscreteSlider onChangeStep={setStep} initialValue={INITIAL_STEP} />
+            </div>
           </div>
           <div className="chart-area">
             {perfError ? (
@@ -169,6 +167,7 @@ function App() {
                 date={lineData.date}
                 option={focusedTicker}
                 loading={isLineLoading}
+                isAbsolute={isAbsolute}
               />
             )}
           </div>
@@ -196,12 +195,12 @@ function App() {
 
         <section className="card">
           <h2 className="card__title">Benchmark Comparison</h2>
-          <BenchmarkChart />
+          <BenchmarkChart selectedPeriod={selectedPeriod} />
         </section>
 
         <section className="card">
           <h2 className="card__title">Portfolio Analytics</h2>
-          <AnalyticsPanel />
+          <AnalyticsPanel selectedPeriod={selectedPeriod} />
         </section>
 
         <section className="card">

@@ -5,11 +5,7 @@
 }
 
 .app__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 32px 6vw 12px;
-  gap: 16px;
 }
 
 .app__title {
@@ -23,12 +19,6 @@
   margin: 6px 0 0;
   color: #4b5563;
   font-size: 15px;
-}
-
-.app__drawer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
 }
 
 .app__content {
@@ -63,6 +53,15 @@
   font-size: 18px;
   font-weight: 600;
   color: #111827;
+}
+
+.card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .chart-area {
@@ -243,6 +242,64 @@
 .metrics__label {
   font-size: 12px;
   color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.metric-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.metric-tooltip__icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.metric-tooltip__box {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  background: #1f2937;
+  color: #f9fafb;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 8px 10px;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 10;
+  white-space: normal;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.metric-tooltip__box::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1f2937;
+}
+
+.metric-tooltip:hover .metric-tooltip__box {
+  display: block;
 }
 
 .metrics__value {
@@ -289,12 +346,20 @@
   border-color: #4f46e5;
 }
 
-@media (max-width: 900px) {
-  .app__header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.toggle-btn-group {
+  display: flex;
+}
 
+.toggle-btn-group .period-btn:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.toggle-btn-group .period-btn:last-child {
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+}
+
+@media (max-width: 900px) {
   .control-row {
     grid-template-columns: 1fr;
   }
@@ -320,9 +385,23 @@
 .perf-controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-end;
+  gap: 16px;
   padding: 12px 0 4px;
+}
+
+.perf-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.perf-control-group__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
 }
 
 /* Record Activity section forms */
@@ -454,6 +533,11 @@
   font-size: 20px;
   font-weight: 700;
   color: #111827;
+}
+
+.benchmark-stat__sub {
+  font-size: 11px;
+  font-weight: 500;
 }
 
 /* Analytics panel */
