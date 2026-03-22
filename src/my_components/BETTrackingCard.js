@@ -2,7 +2,28 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { API_BASE_URL } from './constants.tsx';
 
-function BETTrackingCard() {
+// ── Error boundary wraps the whole card so render errors never white-screen App ──
+class BETErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { error: error.message };
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="error-banner">
+          BET tracking failed to render: {this.state.error}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+function BETTrackingCardInner() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,7 +32,7 @@ function BETTrackingCard() {
     setLoading(true);
     setError(null);
     fetch(`${API_BASE_URL}/bet_tracking`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((r) => (r.ok ? r.json() : Promise.reject(`HTTP ${r.status}`)))
       .then((d) => {
         if (d.error) throw new Error(d.error);
         setData(d);
@@ -33,37 +54,40 @@ function BETTrackingCard() {
     return <div className="error-banner">{error || 'No data'}</div>;
   }
 
-  const { composition, missing_from_top10, extra_holdings, tracking_error } = data;
+  const composition = Array.isArray(data.composition) ? data.composition : [];
+  const missing_from_top10 = Array.isArray(data.missing_from_top10) ? data.missing_from_top10 : [];
+  const extra_holdings = Array.isArray(data.extra_holdings) ? data.extra_holdings : [];
   const heldCount = composition.filter((r) => r.held).length;
 
   const chartOptions = {
     chart: { type: 'bar', toolbar: { show: false }, zoom: { enabled: false } },
-    plotOptions: {
-      bar: { horizontal: false, columnWidth: '60%', borderRadius: 3 },
-    },
+    plotOptions: { bar: { horizontal: false, columnWidth: '60%', borderRadius: 3 } },
     dataLabels: { enabled: false },
     colors: ['#94a3b8', '#4f46e5'],
     xaxis: { categories: composition.map((r) => r.ticker) },
-    yaxis: { labels: { formatter: (v) => (v != null ? Number(v).toFixed(1) + '%' : '') } },
+    yaxis: {
+      labels: { formatter: (v) => (v != null && !isNaN(v) ? Number(v).toFixed(1) + '%' : '') },
+    },
     legend: { position: 'top' },
     tooltip: {
       shared: true,
-      y: { formatter: (v) => (v != null ? Number(v).toFixed(2) + '%' : '') },
+      y: { formatter: (v) => (v != null && !isNaN(v) ? Number(v).toFixed(2) + '%' : '') },
     },
   };
 
   const series = [
-    { name: 'BET Weight', data: composition.map((r) => r.bet_weight) },
-    { name: 'Your Weight', data: composition.map((r) => r.user_weight) },
+    { name: 'BET Weight', data: composition.map((r) => Number(r.bet_weight) || 0) },
+    { name: 'Your Weight', data: composition.map((r) => Number(r.user_weight) || 0) },
   ];
 
   return (
     <div>
-      {/* Summary strip */}
       <div className="bet-summary">
         <div className="bet-summary__stat">
           <span className="bet-summary__label">Tracking Error</span>
-          <span className="bet-summary__value">{tracking_error}%</span>
+          <span className="bet-summary__value">
+            {Number(data.tracking_error || 0).toFixed(2)}%
+          </span>
         </div>
         <div className="bet-summary__stat">
           <span className="bet-summary__label">Positions Held</span>
@@ -74,22 +98,13 @@ function BETTrackingCard() {
         <div className="bet-summary__stat">
           <span className="bet-summary__label">Romanian NAV</span>
           <span className="bet-summary__value">
-            {Math.round(data.total_romanian_nav).toLocaleString()}{' '}
-            RON
+            {Math.round(data.total_romanian_nav || 0).toLocaleString()} RON
           </span>
         </div>
       </div>
 
-      {/* Grouped bar chart: BET vs user per ticker */}
-      <Chart
-        options={chartOptions}
-        series={series}
-        type="bar"
-        height={260}
-        width="100%"
-      />
+      <Chart options={chartOptions} series={series} type="bar" height={260} width="100%" />
 
-      {/* Divergence table */}
       <div className="bet-table">
         <div className="bet-table__header">
           <span>Ticker</span>
@@ -109,9 +124,7 @@ function BETTrackingCard() {
             <span>{Number(row.user_weight).toFixed(2)}%</span>
             <span
               className={
-                row.divergence >= 0
-                  ? 'metrics__value--positive'
-                  : 'metrics__value--negative'
+                row.divergence >= 0 ? 'metrics__value--positive' : 'metrics__value--negative'
               }
             >
               {row.divergence > 0 ? '+' : ''}
@@ -121,14 +134,11 @@ function BETTrackingCard() {
         ))}
       </div>
 
-      {/* Chips for missing / extra */}
       {missing_from_top10.length > 0 && (
         <div className="bet-chips">
           <span className="bet-chips__label">Not held:</span>
           {missing_from_top10.map((t) => (
-            <span key={t} className="bet-chip bet-chip--missing">
-              {t}
-            </span>
+            <span key={t} className="bet-chip bet-chip--missing">{t}</span>
           ))}
         </div>
       )}
@@ -137,13 +147,19 @@ function BETTrackingCard() {
         <div className="bet-chips">
           <span className="bet-chips__label">Outside top 10:</span>
           {extra_holdings.map((t) => (
-            <span key={t} className="bet-chip bet-chip--extra">
-              {t}
-            </span>
+            <span key={t} className="bet-chip bet-chip--extra">{t}</span>
           ))}
         </div>
       )}
     </div>
+  );
+}
+
+function BETTrackingCard() {
+  return (
+    <BETErrorBoundary>
+      <BETTrackingCardInner />
+    </BETErrorBoundary>
   );
 }
 
