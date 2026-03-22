@@ -42,7 +42,9 @@ function MyLineChart(props) {
 
   const options = {
     chart: {
-      id: 'basic-line'
+      id: 'basic-line',
+      toolbar: { show: false },
+      zoom: { enabled: false },
     },
     title: {
       text: props.option,
@@ -66,9 +68,7 @@ function MyLineChart(props) {
     },
     yaxis: {
       labels: {
-        formatter: function (value) {
-          return value.toFixed(2);
-        },
+        formatter: (value) => props.isAbsolute ? value.toFixed(2) : value.toFixed(2) + '%',
       }
     },
     fill: {

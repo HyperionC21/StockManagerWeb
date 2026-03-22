@@ -3,14 +3,17 @@ import MyPieChart from './my_components/MyPieChart'
 import MyToggleButton from './my_components/MyToggleButton';
 import React, { useEffect, useState } from "react";
 import TextPicker from './my_components/TextPicker';
-import MyBottomDrawer from './my_components/MyBottomDrawer';
 import SecurityMetrics from './my_components/SecurityMetrics';
 import MyLineChart from './my_components/MyLineChart';
 import MyTable from './my_components/MyTable';
 import MyDiscreteSlider from './my_components/MyDiscreteSlider';
+import TransactionForm from './my_components/TransactionForm';
+import DividendForm from './my_components/DividendForm';
 
 import { API_BASE_URL } from './my_components/constants.tsx';
 import MyPortfolioTable from './my_components/MyPortfolioTable.js';
+import BenchmarkChart from './my_components/BenchmarkChart';
+import AnalyticsPanel from './my_components/AnalyticsPanel';
 
 const INITIAL_STEP = 90;
 
@@ -105,64 +108,26 @@ function App() {
       });
   }, [selectedOption]);
 
-  const controls = (
-    <div>
-      <h2 className="card__title">Controls</h2>
-      <div className="control-row">
-        <p className="control-row__label">Display Kind</p>
-        <TextPicker
-          style={{ width: "100%" }}
-          options={options}
-          cb={setSelectedOption}
-          className="text-picker"
-        />
-      </div>
-      <div className="control-row">
-        <p className="control-row__label">Time Period</p>
-        <div className="control-row__control">
-          <div className="period-selector">
-            {TIME_PERIODS.map((p) => (
-              <button
-                key={p.value}
-                className={`period-btn${selectedPeriod === p.value ? ' period-btn--active' : ''}`}
-                onClick={() => setSelectedPeriod(p.value)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="control-row">
-        <p className="control-row__label">Performance Chart Toggle</p>
-        <div className="control-row__control">
-          <MyToggleButton cb={setIsAbsolute} />
-        </div>
-      </div>
-      <div className="control-row">
-        <p className="control-row__label">Performance Chart Step</p>
-        <div className="control-row__control control-row__control--wide">
-          <MyDiscreteSlider onChangeStep={setStep} initialValue={INITIAL_STEP} />
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="app">
       <header className="app__header">
-        <div>
-          <h1 className="app__title">Stock Manager</h1>
-          <p className="app__subtitle">Portfolio insights and performance at a glance</p>
-        </div>
-        <div className="app__drawer">
-          <MyBottomDrawer controls={controls} />
-        </div>
+        <h1 className="app__title">Stock Manager</h1>
+        <p className="app__subtitle">Portfolio insights and performance at a glance</p>
       </header>
 
       <main className="app__content">
         <section className="card">
-          <h2 className="card__title">Portfolio Composition</h2>
+          <div className="card__title-row">
+            <h2 className="card__title">Portfolio Composition</h2>
+            <div className="control-row">
+              <p className="control-row__label">Group By</p>
+              <TextPicker
+                options={options}
+                cb={setSelectedOption}
+                className="text-picker"
+              />
+            </div>
+          </div>
           {compError ? (
             <div className="error-banner">{compError}</div>
           ) : (
@@ -172,6 +137,30 @@ function App() {
 
         <section className="card">
           <h2 className="card__title">Performance</h2>
+          <div className="perf-controls">
+            <div className="perf-control-group">
+              <span className="perf-control-group__label">Period</span>
+              <div className="period-selector">
+                {TIME_PERIODS.map((p) => (
+                  <button
+                    key={p.value}
+                    className={`period-btn${selectedPeriod === p.value ? ' period-btn--active' : ''}`}
+                    onClick={() => setSelectedPeriod(p.value)}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="perf-control-group">
+              <span className="perf-control-group__label">Values</span>
+              <MyToggleButton cb={setIsAbsolute} value={isAbsolute} />
+            </div>
+            <div className="perf-control-group">
+              <span className="perf-control-group__label">Interval</span>
+              <MyDiscreteSlider onChangeStep={setStep} initialValue={INITIAL_STEP} />
+            </div>
+          </div>
           <div className="chart-area">
             {perfError ? (
               <div className="error-banner">{perfError}</div>
@@ -181,6 +170,7 @@ function App() {
                 date={lineData.date}
                 option={focusedTicker}
                 loading={isLineLoading}
+                isAbsolute={isAbsolute}
               />
             )}
           </div>
@@ -189,10 +179,14 @@ function App() {
         <section className="card card--split">
           <div className="card__pane">
             <h2 className="card__title">Security Metrics</h2>
-            <SecurityMetrics focusedTicker={focusedTicker} selectedOption={selectedOption} />
+            <SecurityMetrics
+              focusedTicker={focusedTicker}
+              selectedOption={selectedOption}
+              selectedPeriod={selectedPeriod}
+            />
           </div>
           <div className="card__pane">
-            <h2 className="card__title">Holdings Detail</h2>
+            <h2 className="card__title">Transaction History</h2>
             <MyTable ticker={focusedTicker} selectedOption={selectedOption} />
           </div>
         </section>
@@ -200,6 +194,24 @@ function App() {
         <section className="card">
           <h2 className="card__title">Portfolio Table</h2>
           <MyPortfolioTable />
+        </section>
+
+        <section className="card">
+          <h2 className="card__title">Benchmark Comparison</h2>
+          <BenchmarkChart selectedPeriod={selectedPeriod} />
+        </section>
+
+        <section className="card">
+          <h2 className="card__title">Portfolio Analytics</h2>
+          <AnalyticsPanel selectedPeriod={selectedPeriod} />
+        </section>
+
+        <section className="card">
+          <h2 className="card__title">Record Activity</h2>
+          <div className="entry-forms">
+            <TransactionForm />
+            <DividendForm />
+          </div>
         </section>
       </main>
     </div>
