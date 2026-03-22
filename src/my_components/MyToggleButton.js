@@ -1,24 +1,22 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React from 'react';
 
-const MyToggleButton = (props) => {
-    const [toggle, setToggle] = useState(false);
-  
-    const handleToggle = () => {
-        props.cb(!toggle);
-        setToggle(!toggle);
-    };
-
-  
-    return (
-      <label>
-        <input
-          type="radio"
-          checked={toggle}
-          onClick={handleToggle}
-        />
-            {toggle ? 'Absolute' : 'Percentage'}
-      </label>
-    );
-  };
+const MyToggleButton = ({ cb, value }) => {
+  return (
+    <div className="toggle-btn-group">
+      <button
+        className={`period-btn${!value ? ' period-btn--active' : ''}`}
+        onClick={() => cb(false)}
+      >
+        %
+      </button>
+      <button
+        className={`period-btn${value ? ' period-btn--active' : ''}`}
+        onClick={() => cb(true)}
+      >
+        Absolute
+      </button>
+    </div>
+  );
+};
 
 export default MyToggleButton;
