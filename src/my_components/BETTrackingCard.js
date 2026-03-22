@@ -44,11 +44,11 @@ function BETTrackingCard() {
     dataLabels: { enabled: false },
     colors: ['#94a3b8', '#4f46e5'],
     xaxis: { categories: composition.map((r) => r.ticker) },
-    yaxis: { labels: { formatter: (v) => v.toFixed(1) + '%' } },
+    yaxis: { labels: { formatter: (v) => (v != null ? Number(v).toFixed(1) + '%' : '') } },
     legend: { position: 'top' },
     tooltip: {
       shared: true,
-      y: { formatter: (v) => v.toFixed(2) + '%' },
+      y: { formatter: (v) => (v != null ? Number(v).toFixed(2) + '%' : '') },
     },
   };
 
@@ -74,9 +74,7 @@ function BETTrackingCard() {
         <div className="bet-summary__stat">
           <span className="bet-summary__label">Romanian NAV</span>
           <span className="bet-summary__value">
-            {data.total_romanian_nav.toLocaleString('ro-RO', {
-              maximumFractionDigits: 0,
-            })}{' '}
+            {Math.round(data.total_romanian_nav).toLocaleString()}{' '}
             RON
           </span>
         </div>
@@ -107,8 +105,8 @@ function BETTrackingCard() {
           >
             <span className="bet-table__ticker">{row.ticker}</span>
             <span className="bet-table__name">{row.name}</span>
-            <span>{row.bet_weight.toFixed(2)}%</span>
-            <span>{row.user_weight.toFixed(2)}%</span>
+            <span>{Number(row.bet_weight).toFixed(2)}%</span>
+            <span>{Number(row.user_weight).toFixed(2)}%</span>
             <span
               className={
                 row.divergence >= 0
@@ -117,7 +115,7 @@ function BETTrackingCard() {
               }
             >
               {row.divergence > 0 ? '+' : ''}
-              {row.divergence.toFixed(2)}%
+              {Number(row.divergence).toFixed(2)}%
             </span>
           </div>
         ))}
