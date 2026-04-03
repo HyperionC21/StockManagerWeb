@@ -70,7 +70,7 @@ function BenchmarkChart({ selectedPeriod }) {
       zoom: { enabled: false },
     },
     colors: ['#4f46e5', ...BENCHMARK_COLORS],
-    stroke: { curve: 'smooth', width: 2 },
+    stroke: { curve: 'smooth', width: [3, ...BENCHMARK_COLORS.map(() => 2)] },
     dataLabels: { enabled: false },
     legend: { position: 'top' },
     xaxis: {
